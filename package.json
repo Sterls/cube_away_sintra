@@ -1,0 +1,9 @@
+{
+  "name": "cube-away",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "start": "npx --yes http-server -c-1 -p 8080 ."
+  }
+}
