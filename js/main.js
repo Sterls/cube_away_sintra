@@ -4,6 +4,7 @@ import { Game } from './game.js';
 import { getLevel } from './levels.js';
 import * as store from './storage.js';
 import { play, unlockAudio, setSoundEnabled } from './audio.js';
+import * as board from './leaderboard.js';
 
 const $ = (id) => document.getElementById(id);
 let save = store.load();
@@ -29,7 +30,7 @@ const LOCK_SVG = '<svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height=
 // ---------- screens ----------
 
 function show(screen) {
-  for (const id of ['home', 'levels', 'hud', 'win', 'settings']) $(id).classList.add('hidden');
+  for (const id of ['home', 'levels', 'board', 'hud', 'win', 'settings']) $(id).classList.add('hidden');
   game?.setActive(screen === 'game');
   if (screen === 'home') {
     $('home').classList.remove('hidden');
@@ -37,6 +38,9 @@ function show(screen) {
   } else if (screen === 'levels') {
     renderLevelGrid();
     $('levels').classList.remove('hidden');
+  } else if (screen === 'board') {
+    $('board').classList.remove('hidden');
+    renderBoard();
   } else if (screen === 'game') {
     $('hud').classList.remove('hidden');
   }
@@ -82,6 +86,60 @@ function renderLevelGrid() {
   grid.querySelector('.current')?.scrollIntoView({ block: 'center' });
 }
 
+// ---------- leaderboard ----------
+
+// The score is the furthest level beaten.
+const bestLevel = () => save.unlocked - 1;
+
+function submitScore() {
+  if (!board.isConfigured() || !save.name) return Promise.resolve();
+  return board.submit(save.playerId, save.name, bestLevel()).catch(() => {});
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+async function renderBoard({ askName = false } = {}) {
+  const list = $('board-list'), status = $('board-status');
+  const joining = askName || !save.name;
+  list.innerHTML = '';
+  $('board-me').classList.add('hidden');
+  $('board-join').classList.add('hidden');
+
+  if (!board.isConfigured()) {
+    status.textContent = "The leaderboard isn't set up yet.";
+    return;
+  }
+  if (joining) {
+    status.textContent = '';
+    $('name-input').value = save.name;
+    $('board-join').classList.remove('hidden');
+    return;
+  }
+
+  $('board-me-text').textContent = `You: ${save.name} · level ${bestLevel()}`;
+  $('board-me').classList.remove('hidden');
+  status.textContent = 'Loading…';
+  try {
+    await submitScore();
+    const rows = await board.fetchTop(50);
+    if ($('board').classList.contains('hidden')) return;
+    status.textContent = rows.length ? 'Furthest level beaten' : 'No scores yet. Beat a level to get on the board!';
+    const medals = ['🥇', '🥈', '🥉'];
+    list.innerHTML = rows.map((r, i) => `
+      <li class="${r.name === save.name ? 'me' : ''}">
+        <span class="rank">${medals[i] || i + 1}</span>
+        <span class="who">${escapeHtml(r.name)}</span>
+        <span class="lvl">Level ${r.level}</span>
+      </li>`).join('');
+  } catch {
+    status.textContent = "Couldn't load the leaderboard. Check your internet and try again.";
+  }
+}
+
 // ---------- playing ----------
 
 function startLevel(n) {
@@ -110,6 +168,7 @@ function onWin(mistakes) {
   save.stars[currentLevel] = Math.max(save.stars[currentLevel] || 0, stars);
   save.unlocked = Math.max(save.unlocked, currentLevel + 1);
   store.save(save);
+  submitScore();
   play('win');
   vibrate([20, 60, 20]);
 
@@ -159,6 +218,18 @@ function init() {
 
   $('play-btn').addEventListener('click', () => { play('click'); go('game', { level: save.unlocked }); });
   $('levels-btn').addEventListener('click', () => { play('click'); go('levels'); });
+  $('board-btn').addEventListener('click', () => { play('click'); go('board'); });
+  $('board-join').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = $('name-input').value.trim().slice(0, 20);
+    if (!name) return;
+    save.name = name;
+    store.save(save);
+    $('name-input').blur();
+    play('click');
+    renderBoard();
+  });
+  $('rename-btn').addEventListener('click', () => { play('click'); renderBoard({ askName: true }); });
   $('settings-btn').addEventListener('click', () => { play('click'); go('home', { modal: 'settings' }); });
   for (const b of document.querySelectorAll('[data-back]')) {
     b.addEventListener('click', () => { play('click'); history.back(); });
@@ -181,7 +252,7 @@ function init() {
   });
   $('reset-btn').addEventListener('click', () => {
     if (confirm('Start over from level 1? Your stars will be cleared.')) {
-      save = store.reset();
+      save = store.reset(save);
       setSoundEnabled(save.sound);
       openSettings();
     }
@@ -192,6 +263,7 @@ function init() {
 
   history.replaceState({ screen: 'home' }, '');
   show('home');
+  submitScore(); // catch up on any score earned while offline
 
   if ('serviceWorker' in navigator && location.protocol === 'https:') {
     navigator.serviceWorker.register('sw.js').catch(() => {});

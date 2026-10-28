@@ -37,3 +37,11 @@ test('levels have some cubes that start blocked', () => {
     assert.ok(blocked > 0, `level ${n} has no blocked cubes`);
   }
 });
+
+test('levels keep generating far beyond the first few hundred', () => {
+  for (const n of [500, 1000, 5000, 12345, 99999, 1000000]) {
+    const lvl = getLevel(n);
+    assert.ok(lvl.cubes.length >= 4, `level ${n} too small`);
+    assert.ok(solve(lvl.cubes), `level ${n} is not solvable`);
+  }
+});

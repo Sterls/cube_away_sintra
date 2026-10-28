@@ -28,6 +28,7 @@
     <p class="tagline">Tap a cube to send it flying.<br>Clear them all!</p>
     <button id="play-btn" class="btn big">Play</button>
     <button id="levels-btn" class="btn secondary">Levels</button>
+    <button id="board-btn" class="btn secondary">Leaderboard</button>
     <button id="settings-btn" class="btn ghost">Settings</button>
   </section>
 
@@ -41,6 +42,28 @@
       <span class="bar-spacer"></span>
     </header>
     <div id="level-grid"></div>
+  </section>
+
+  <!-- Leaderboard -->
+  <section id="board" class="screen hidden">
+    <header class="bar">
+      <button class="icon-btn" data-back aria-label="Back">
+        <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>
+      </button>
+      <h2>Leaderboard</h2>
+      <span class="bar-spacer"></span>
+    </header>
+    <form id="board-join" class="board-join hidden">
+      <label for="name-input">Pick a name to join the leaderboard</label>
+      <input id="name-input" maxlength="20" autocomplete="nickname" placeholder="Your name" required>
+      <button class="btn" type="submit">Join</button>
+    </form>
+    <p id="board-status" class="board-status"></p>
+    <ol id="board-list" class="board-list"></ol>
+    <footer id="board-me" class="board-me hidden">
+      <span id="board-me-text"></span>
+      <button id="rename-btn" class="link-btn" type="button">Change name</button>
+    </footer>
   </section>
 
   <!-- In-game controls -->

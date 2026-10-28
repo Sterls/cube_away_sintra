@@ -111,6 +111,43 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .level-tile.locked { background: rgba(255, 255, 255, 0.45); color: #b3b0cc; box-shadow: none; }
 .level-tile.locked svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.4; }
 
+/* ---------- leaderboard ---------- */
+
+#board { display: flex; flex-direction: column; }
+.board-join {
+  display: flex; flex-direction: column; gap: 12px; align-items: stretch;
+  background: #fff; border-radius: 22px; padding: 20px; margin-top: 18px;
+  box-shadow: 0 6px 18px rgba(43, 42, 74, 0.08);
+}
+.board-join label { font-size: 18px; font-weight: 600; text-align: center; }
+.board-join input {
+  font: inherit; font-size: 20px; padding: 14px 16px; border-radius: 14px;
+  border: 2px solid #d6d1ff; outline: none; color: var(--ink);
+  user-select: text; -webkit-user-select: text;
+}
+.board-join input:focus { border-color: var(--accent); }
+.board-status { text-align: center; color: var(--ink-soft); font-size: 17px; margin: 18px 0 0; }
+.board-status:empty { display: none; }
+.board-list {
+  list-style: none; margin: 14px 0 0; padding: 0; flex: 1; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.board-list li {
+  display: flex; align-items: center; gap: 12px;
+  background: #fff; border-radius: 16px; padding: 12px 16px; font-size: 19px;
+  box-shadow: 0 3px 0 #e6e3f5;
+}
+.board-list li.me { background: #f0eeff; box-shadow: 0 3px 0 #d6d1ff; }
+.board-list .rank { width: 34px; font-weight: 800; color: var(--ink-soft); text-align: center; }
+.board-list li:nth-child(1) .rank, .board-list li:nth-child(2) .rank, .board-list li:nth-child(3) .rank { font-size: 24px; }
+.board-list .who { flex: 1; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.board-list .lvl { font-weight: 800; color: var(--accent); }
+.board-me {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 14px 4px 0; font-size: 16px; color: var(--ink-soft);
+}
+.link-btn { border: 0; background: none; color: var(--accent); font-weight: 700; font-size: 16px; padding: 8px; }
+
 /* ---------- in-game ---------- */
 
 #hud { position: fixed; inset: 0; pointer-events: none; }
