@@ -66,8 +66,14 @@ dashboard and click **Restore** if the board stops loading.
 
 ```bash
 npm start   # serves the game at http://localhost:8080
-npm test    # checks the first 300 levels are all solvable
+npm run stamp  # after changing any game file: updates the version in sw.js
+npm test    # checks levels are solvable and the version stamp is current
 ```
+
+Installed copies of the game check for a new version whenever they're opened
+(and hourly while open). When one has downloaded, the menu shows
+**"A new version is ready · Update"**. Phones only notice a release if the
+version in `sw.js` changed, which is why `npm run stamp` matters.
 
 Files:
 
@@ -77,5 +83,6 @@ Files:
 - `js/levels.js`: level generator
 - `js/audio.js`: sound effects, synthesized in the browser
 - `js/leaderboard.js`, `js/config.js`, `supabase/setup.sql`: the optional leaderboard
-- `sw.js`, `manifest.webmanifest`: offline support and install-to-home-screen
+- `sw.js`, `manifest.webmanifest`: offline support, updates and install-to-home-screen
+- `scripts/stamp.mjs`: writes the version fingerprint into `sw.js`
 - `vendor/`: a local copy of [three.js](https://threejs.org) r170 (MIT), so the game never loads code from other sites

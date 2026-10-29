@@ -1,8 +1,15 @@
-// Offline support. Everything is served from the cache first (so the game
-// opens instantly with no signal), and refreshed from the network in the
-// background, so updates show up the next time the game is opened.
+// Offline support and updates.
+//
+// Each version of the game is downloaded in full and kept on the phone, so it
+// opens instantly with no signal. When a new version is published, it is
+// downloaded in the background and waits; the game then shows a
+// "New version ready" bar, and tapping Update switches over.
+//
+// VERSION is a fingerprint of the files below. Run `npm run stamp` after
+// changing any of them (`npm test` fails if you forget), so phones notice.
 
-const CACHE = 'cube-away-v3';
+const VERSION = 'e6a1bbe07219';
+const CACHE = `cube-away-${VERSION}`;
 const ASSETS = [
   './',
   'index.html',
@@ -22,7 +29,9 @@ const ASSETS = [
 ];
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(ASSETS)).then(() => self.skipWaiting()));
+  // Bypass the browser's HTTP cache so we get this version's files, not stale ones.
+  event.waitUntil(caches.open(CACHE).then((cache) =>
+    cache.addAll(ASSETS.map((url) => new Request(url, { cache: 'reload' })))));
 });
 
 self.addEventListener('activate', (event) => {
@@ -32,22 +41,16 @@ self.addEventListener('activate', (event) => {
       .then(() => self.clients.claim()));
 });
 
+// The page asks for this when the player taps Update.
+self.addEventListener('message', (event) => {
+  if (event.data === 'skipWaiting') self.skipWaiting();
+});
+
 self.addEventListener('fetch', (event) => {
   const req = event.request;
   if (req.method !== 'GET' || new URL(req.url).origin !== location.origin) return;
   event.respondWith(
-    caches.open(CACHE).then(async (cache) => {
-      const cached = await cache.match(req, { ignoreSearch: true });
-      const fresh = fetch(req)
-        .then((res) => {
-          if (res.ok) cache.put(req, res.clone());
-          return res;
-        })
-        .catch(() => cached);
-      if (cached) {
-        event.waitUntil(fresh);
-        return cached;
-      }
-      return fresh;
-    }));
+    caches.open(CACHE)
+      .then((cache) => cache.match(req, { ignoreSearch: true }))
+      .then((cached) => cached || fetch(req)));
 });

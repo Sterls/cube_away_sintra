@@ -14,6 +14,7 @@ let game;
 let currentLevel = 1;
 let current = null; // the level being played
 let helpTimer = null;
+let waitingWorker = null; // a downloaded new version, waiting for the player to tap Update
 
 function vibrate(pattern) {
   if (!save.vibrate) return;
@@ -60,6 +61,8 @@ const LOCK_SVG = '<svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height=
 function show(screen) {
   for (const id of ['home', 'levels', 'board', 'hud', 'win', 'settings']) $(id).classList.add('hidden');
   game?.setActive(screen === 'game');
+  // Offer updates from the menus, never in the middle of a level.
+  $('update-bar').classList.toggle('hidden', !waitingWorker || screen === 'game');
   if (screen === 'home') {
     $('home').classList.remove('hidden');
     $('play-btn').textContent = save.unlocked > 1 ? `Play · Level ${save.unlocked}` : 'Play';
@@ -395,9 +398,47 @@ function init() {
   show('home');
   submitScore(); // catch up on any score earned while offline
 
-  if ('serviceWorker' in navigator && location.protocol === 'https:') {
-    navigator.serviceWorker.register('sw.js').catch(() => {});
-  }
+  setupUpdates();
+}
+
+// ---------- offline copy & updates ----------
+
+function setupUpdates() {
+  const local = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  if (!('serviceWorker' in navigator) || (location.protocol !== 'https:' && !local)) return;
+
+  let updating = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!updating) return; // the very first install also fires this; don't reload for it
+    updating = false;
+    location.reload();
+  });
+  $('update-btn').addEventListener('click', () => {
+    if (!waitingWorker) return;
+    updating = true;
+    $('update-btn').disabled = true;
+    $('update-btn').textContent = 'Updating…';
+    waitingWorker.postMessage('skipWaiting');
+  });
+
+  navigator.serviceWorker.register('sw.js').then((reg) => {
+    const offer = () => {
+      // Only offer an update over an existing version, not on the first visit.
+      if (!reg.waiting || !navigator.serviceWorker.controller) return;
+      waitingWorker = reg.waiting;
+      if ($('hud').classList.contains('hidden')) $('update-bar').classList.remove('hidden');
+    };
+    offer();
+    reg.addEventListener('updatefound', () => {
+      const worker = reg.installing;
+      worker?.addEventListener('statechange', () => { if (worker.state === 'installed') offer(); });
+    });
+    // Look for a new version whenever the game comes back to the foreground,
+    // and every hour while it stays open.
+    const check = () => reg.update().catch(() => {});
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) check(); });
+    setInterval(check, 60 * 60 * 1000);
+  }).catch(() => {});
 }
 
 init();
