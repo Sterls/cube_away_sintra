@@ -12,6 +12,14 @@ in the way, it bumps and comes back. Clear every cube to finish the level.
   trickier as you go, and every level is guaranteed solvable (they are built
   by solving backwards; see `js/levels.js`).
 - **Leaderboard** shows who has beaten the furthest level (optional, see below).
+- **Challenges** every 5th level (from level 5) win trophies, rotating through:
+  - **Picture**: the cubes form a picture (heart, house, cat, …) in its own colours.
+  - **Perfect run**: no bumps allowed; a bump starts the level over.
+  - **Speed bonus**: finish inside a target time (the clock starts on the first tap).
+  - **Tap bonus**: finish within a tap limit.
+
+  Speed and tap bonuses can't be failed: missing the target just means no
+  trophy, and the next level still unlocks.
 - Progress is saved on the phone. Works offline once opened.
 
 ## Installing on an Android phone

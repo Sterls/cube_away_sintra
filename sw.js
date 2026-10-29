@@ -2,7 +2,7 @@
 // opens instantly with no signal), and refreshed from the network in the
 // background, so updates show up the next time the game is opened.
 
-const CACHE = 'cube-away-v2';
+const CACHE = 'cube-away-v3';
 const ASSETS = [
   './',
   'index.html',

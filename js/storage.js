@@ -3,7 +3,7 @@
 const KEY = 'cube-away-save-v1';
 
 const defaults = () => ({
-  unlocked: 1, stars: {}, sound: true, vibrate: true, seenHelp: false,
+  unlocked: 1, stars: {}, trophies: {}, sound: true, vibrate: true, seenHelp: false,
   name: '', playerId: '', // leaderboard identity
 });
 

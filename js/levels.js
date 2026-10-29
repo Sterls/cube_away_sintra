@@ -149,7 +149,9 @@ function assignDirections(cells, rng, tangle) {
       if (score > bestScore) { bestScore = score; best = i; }
     }
     present.delete(pick.k);
-    result.push([pick.c[0], pick.c[1], pick.c[2], best]);
+    const cube = [pick.c[0], pick.c[1], pick.c[2], best];
+    if (pick.c[3] !== undefined) cube.push(pick.c[3]); // fixed colour (picture levels)
+    result.push(cube);
   }
   // Present cubes in a random order so the solve order isn't leaked.
   for (let i = result.length - 1; i > 0; i--) {
@@ -157,6 +159,135 @@ function assignDirections(cells, rng, tangle) {
     [result[i], result[j]] = [result[j], result[i]];
   }
   return result;
+}
+
+// ---------- picture levels ----------
+// Pixel art, extruded two cubes deep. Each letter is a colour.
+
+const COLORS = {
+  R: '#ff6b6b', P: '#ffafcc', Y: '#ffd166', O: '#f4a261', G: '#80ed99', D: '#3fb87f',
+  B: '#7cc6fe', N: '#4d8fd6', W: '#f4f4f8', K: '#a9744f', L: '#cdb4db', S: '#adb5bd',
+};
+
+const PICTURES = [
+  { name: 'Heart', art: [
+    '.RR.RR.',
+    'RRRRRRR',
+    'RRRRRRR',
+    '.RRRRR.',
+    '..RRR..',
+    '...R...'] },
+  { name: 'House', art: [
+    '...R...',
+    '..RRR..',
+    '.RRRRR.',
+    'RRRRRRR',
+    '.YYYYY.',
+    '.YBYKY.',
+    '.YYYKY.'] },
+  { name: 'Tree', art: [
+    '...D...',
+    '..DGD..',
+    '.GDGGD.',
+    'DGGDGGD',
+    '.GGGGG.',
+    '...K...',
+    '...K...'] },
+  { name: 'Cat', art: [
+    'O.....O',
+    'OO...OO',
+    'OOOOOOO',
+    'ONOOONO',
+    'OOOPOOO',
+    '.OOOOO.'] },
+  { name: 'Star', art: [
+    '....Y....',
+    '...YYY...',
+    'YYYYYYYYY',
+    '.YYYYYYY.',
+    '..YYYYY..',
+    '.YYY.YYY.',
+    'YY.....YY'] },
+  { name: 'Flower', art: [
+    '..P.P..',
+    '.PPPPP.',
+    'PPPYPPP',
+    '.PPPPP.',
+    '..PDP..',
+    '.DDD...',
+    '...D...'] },
+  { name: 'Fish', art: [
+    '...BB....',
+    '.BBBBB..B',
+    'BBNBBBBBB',
+    'BBBBBBBBB',
+    '.BBBBB..B',
+    '...BB....'] },
+  { name: 'Mushroom', art: [
+    '..RRRRR..',
+    '.RRWRRWR.',
+    'RRRRRRRRR',
+    'RWRRRWRRR',
+    '...WWW...',
+    '...WWW...',
+    '...WWW...'] },
+  { name: 'Sun', art: [
+    '..YYYYY..',
+    '.YYYYYYY.',
+    'YYKYYYKYY',
+    'YYYYYYYYY',
+    'YKYYYYYKY',
+    '.YKKKKKY.',
+    '..YYYYY..'] },
+  { name: 'Apple', art: [
+    '....K..',
+    '...KG..',
+    '.RRRRR.',
+    'RRRRRRR',
+    'RRRRRRR',
+    'RRRRRRR',
+    '.RRRRR.',
+    '..R.R..'] },
+  { name: 'Ice cream', art: [
+    '.PPP.',
+    'PPPPP',
+    'PWPPP',
+    '.KKK.',
+    '.KKK.',
+    '..K..'] },
+  { name: 'Umbrella', art: [
+    '...L...',
+    '.LLLLL.',
+    'LLLLLLL',
+    'L.L.L.L',
+    '...S...',
+    '...S...',
+    '.S.S...',
+    '..S....'] },
+];
+
+export const PICTURE_COUNT = PICTURES.length;
+
+function pictureCells(picture, depth) {
+  const cells = [];
+  const rows = picture.art.length;
+  picture.art.forEach((row, r) => {
+    [...row].forEach((ch, x) => {
+      if (ch === '.') return;
+      for (let z = 0; z < depth; z++) cells.push([x, rows - 1 - r, z, COLORS[ch]]);
+    });
+  });
+  return cells;
+}
+
+// ---------- challenge levels ----------
+// From level 5, every 5th level is a challenge, rotating through these.
+
+const CHALLENGES = ['picture', 'perfect', 'speed', 'taps'];
+
+export function challengeType(n) {
+  if (n < 5 || n % 5 !== 0) return null;
+  return CHALLENGES[(n / 5 - 1) % CHALLENGES.length];
 }
 
 // ---------- public API ----------
@@ -180,9 +311,24 @@ export function getLevel(n) {
     return { number: n, palette, cubes: TUTORIAL[n - 1].cells.map((c) => c.slice()) };
   }
 
-  // Size grows slowly with level: about 2 -> 7 cubes per side.
+  const challenge = challengeType(n);
+  if (challenge === 'picture') {
+    const index = (n / 5 - 1) / CHALLENGES.length;
+    const picture = PICTURES[index % PICTURES.length];
+    const depth = n < 25 ? 1 : 2; // flat pictures while the game is still easy
+    return {
+      number: n, palette, challenge, picture: picture.name, front: true,
+      cubes: assignDirections(pictureCells(picture, depth), rng, Math.min(0.8, 0.35 + n * 0.02)),
+    };
+  }
+
+  // Size grows slowly with level: about 2 -> 7 cubes per side. Timed, tap
+  // limited and no-bump challenges are capped at medium size so they're fair.
   const s = Math.min(6, 2 + Math.floor(n / 10));
-  const dim = () => Math.max(2, Math.min(7, s + randInt(rng, -1, 1)));
+  const dim = () => {
+    const d = Math.max(2, Math.min(7, s + randInt(rng, -1, 1)));
+    return challenge ? Math.max(3, Math.min(5, d)) : d;
+  };
   let X = dim(), Y = dim(), Z = dim();
 
   const shapes = [box, box];
@@ -201,7 +347,14 @@ export function getLevel(n) {
   if (cells.length < 4) cells = box(2, 2, 2);
 
   const tangle = Math.min(1, 0.35 + n * 0.02);
-  return { number: n, palette, cubes: assignDirections(cells, rng, tangle) };
+  const level = { number: n, palette, cubes: assignDirections(cells, rng, tangle) };
+  if (challenge) level.challenge = challenge;
+  const count = level.cubes.length;
+  // Seconds to beat: time to spot and tap each cube, plus a little slack.
+  if (challenge === 'speed') level.targetSeconds = Math.round((10 + count * 1.6) / 5) * 5;
+  // Taps allowed: one per cube plus a few spare for bumps.
+  if (challenge === 'taps') level.tapLimit = count + Math.max(2, Math.round(count * 0.08));
+  return level;
 }
 
 // Returns the distance (in cells) to the first cube in the way, or 0 if the

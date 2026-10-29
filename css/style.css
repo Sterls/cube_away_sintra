@@ -111,6 +111,27 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .level-tile.locked { background: rgba(255, 255, 255, 0.45); color: #b3b0cc; box-shadow: none; }
 .level-tile.locked svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.4; }
 
+/* ---------- challenges ---------- */
+
+.trophy-count {
+  margin: -8px 0 6px; padding: 6px 16px; border-radius: 999px;
+  background: #fff3c4; color: #8a6100; font-weight: 700; font-size: 17px;
+}
+.goal {
+  position: absolute; left: 50%; top: calc(80px + var(--safe-top)); transform: translateX(-50%);
+  width: max-content; max-width: calc(100% - 32px);
+  padding: 7px 16px; border-radius: 999px;
+  background: #fff3c4; color: #8a6100; font-size: 17px; font-weight: 700;
+  box-shadow: 0 3px 10px rgba(138, 97, 0, 0.15);
+  font-variant-numeric: tabular-nums;
+}
+.goal.over { background: #eceaf4; color: var(--ink-soft); box-shadow: none; }
+.level-tile.challenge { background: #fff3c4; box-shadow: 0 4px 0 #f2d77a; color: #8a6100; }
+.level-tile.challenge.current { background: #ffc53d; box-shadow: 0 4px 0 #d9a21b; color: #4d3600; }
+.level-tile small.dim { filter: grayscale(1); opacity: 0.35; }
+.trophy { font-size: 72px; line-height: 1; animation: star-in 0.5s cubic-bezier(.2, 1.6, .5, 1) backwards; }
+.trophy.missed { filter: grayscale(1); opacity: 0.35; animation: none; }
+
 /* ---------- leaderboard ---------- */
 
 #board { display: flex; flex-direction: column; }
@@ -165,7 +186,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .mistakes { font-size: 30px; letter-spacing: 2px; color: var(--star); text-shadow: 0 2px 4px rgba(43, 42, 74, 0.15); min-height: 1em; }
 
 .help {
-  position: absolute; left: 50%; top: calc(90px + var(--safe-top)); transform: translateX(-50%);
+  position: absolute; left: 50%; top: calc(128px + var(--safe-top)); transform: translateX(-50%);
   width: max-content; max-width: calc(100% - 32px);
   background: rgba(43, 42, 74, 0.86); color: #fff; text-align: center;
   font-size: 17px; line-height: 1.45; padding: 12px 18px; border-radius: 16px;

@@ -184,7 +184,12 @@ export class Game {
     this.animations = [];
     this.level = level;
     this.mistakes = 0;
+    this.taps = 0;
     this.won = false;
+    this.failed = false; // a perfect-run challenge was bumped
+    this.startTime = null; // the clock starts on the first tap
+    this.endTime = null;
+    this.pausedAt = null;
     this.occupied = new Map();
     this.bounds = boundsOf(level.cubes);
 
@@ -193,7 +198,7 @@ export class Game {
       (min[0] + max[0]) / 2, (min[1] + max[1]) / 2, (min[2] + max[2]) / 2);
 
     level.cubes.forEach((c, i) => {
-      const color = level.palette[i % level.palette.length];
+      const color = c[4] || level.palette[i % level.palette.length];
       const mesh = new THREE.Mesh(this.geometry, this._materials(color, c[3]));
       mesh.position.set(c[0] - center.x, c[1] - center.y, c[2] - center.z);
       mesh.userData = { cube: c, color, home: mesh.position.clone(), busy: false, alive: true };
@@ -208,12 +213,30 @@ export class Game {
     this.spin = { x: 0, y: 0 };
     this.pivot.quaternion.setFromEuler(new THREE.Euler(0.45, -0.65, 0, 'XYZ'));
     if (size.z === 1) this.pivot.quaternion.setFromEuler(new THREE.Euler(0.25, -0.3, 0, 'XYZ'));
+    if (level.front) this.pivot.quaternion.setFromEuler(new THREE.Euler(0.15, -0.25, 0, 'XYZ'));
     this._placeCamera();
     this.dirty = true;
   }
 
   get remaining() {
     return this.occupied ? this.occupied.size : 0;
+  }
+
+  // Seconds since the first tap, not counting time the app was in the background.
+  get elapsed() {
+    if (this.startTime === null) return 0;
+    const end = this.endTime ?? this.pausedAt ?? performance.now();
+    return (end - this.startTime) / 1000;
+  }
+
+  pauseClock() {
+    if (this.pausedAt === null) this.pausedAt = performance.now();
+  }
+
+  resumeClock() {
+    if (this.pausedAt === null) return;
+    if (this.startTime !== null && this.endTime === null) this.startTime += performance.now() - this.pausedAt;
+    this.pausedAt = null;
   }
 
   setActive(active) {
@@ -241,7 +264,10 @@ export class Game {
 
   _tap(mesh) {
     const u = mesh.userData;
-    if (!u.alive || u.busy || this.won) return;
+    if (!u.alive || u.busy || this.won || this.failed) return;
+    this.taps++;
+    if (this.startTime === null) this.startTime = performance.now();
+    this.cb.onTap?.(this.taps);
     if (u.pulse) {
       u.pulse.cancelled = true;
       mesh.scale.setScalar(1);
@@ -263,6 +289,7 @@ export class Game {
       this.cb.onRemove?.(this.remaining);
       if (this.remaining === 0) {
         this.won = true;
+        this.endTime = performance.now();
         setTimeout(() => this.cb.onWin?.(this.mistakes), 650);
       }
       return;
@@ -270,13 +297,15 @@ export class Game {
 
     // Blocked: slide up to the blocker, bump, and come back.
     this.mistakes++;
+    if (this.level.challenge === 'perfect') this.failed = true;
     u.busy = true;
     const b = u.cube;
     const blocker = this.occupied.get(key(b[0] + d[0] * dist, b[1] + d[1] * dist, b[2] + d[2] * dist));
     const reach = dist - 1 + 0.1;
     const start = u.home.clone();
     const dur = 0.22 + reach * 0.09;
-    mesh.material = this._materials('#ff6b6b', u.cube[3]);
+    // Picture levels have red cubes of their own, so they flash dark instead.
+    mesh.material = this._materials(this.level.front ? '#3d3a55' : '#ff6b6b', u.cube[3]);
     let bumped = false;
     this._animate(dur, (t) => {
       const s = t < 0.5 ? ease.out(t * 2) : 1 - ease.inOut((t - 0.5) * 2);
@@ -292,6 +321,7 @@ export class Game {
         mesh.material = this._materials(u.color, u.cube[3]);
         u.busy = false;
         this.dirty = true;
+        if (this.failed) this.cb.onFail?.();
       }, 150);
     });
     this.cb.onMistake?.(this.mistakes);

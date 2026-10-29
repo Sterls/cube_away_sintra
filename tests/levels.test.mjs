@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { getLevel, blockerDistance, boundsOf, key } from '../js/levels.js';
+import { getLevel, blockerDistance, boundsOf, key, challengeType, PICTURE_COUNT } from '../js/levels.js';
 
 // Greedy solver: removing a cube never blocks another, so if the level is
 // solvable, repeatedly removing any free cube must clear it.
@@ -44,4 +44,28 @@ test('levels keep generating far beyond the first few hundred', () => {
     assert.ok(lvl.cubes.length >= 4, `level ${n} too small`);
     assert.ok(solve(lvl.cubes), `level ${n} is not solvable`);
   }
+});
+
+test('challenges come every 5 levels from level 5, rotating through four types', () => {
+  assert.equal(challengeType(4), null);
+  assert.equal(challengeType(6), null);
+  assert.deepEqual([5, 10, 15, 20, 25].map(challengeType), ['picture', 'perfect', 'speed', 'taps', 'picture']);
+  for (let n = 1; n <= 400; n++) assert.equal(getLevel(n).challenge ?? null, challengeType(n));
+});
+
+test('challenge levels are solvable and carry their goals', () => {
+  const pictures = new Set();
+  for (let n = 5; n <= 5 * 4 * PICTURE_COUNT; n += 5) {
+    const lvl = getLevel(n);
+    assert.ok(solve(lvl.cubes), `challenge level ${n} is not solvable`);
+    if (lvl.challenge === 'picture') {
+      pictures.add(lvl.picture);
+      assert.ok(lvl.cubes.every((c) => typeof c[4] === 'string'), `picture level ${n} is missing colours`);
+    } else {
+      assert.ok(lvl.cubes.length <= 125, `challenge level ${n} is too big`);
+    }
+    if (lvl.challenge === 'speed') assert.ok(lvl.targetSeconds >= lvl.cubes.length, `level ${n} target too tight`);
+    if (lvl.challenge === 'taps') assert.ok(lvl.tapLimit > lvl.cubes.length, `level ${n} tap limit too tight`);
+  }
+  assert.equal(pictures.size, PICTURE_COUNT, 'every picture should appear once per cycle');
 });
