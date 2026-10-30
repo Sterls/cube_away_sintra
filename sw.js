@@ -8,8 +8,8 @@
 // VERSION is a fingerprint of the files below. Run `npm run stamp` after
 // changing any of them (`npm test` fails if you forget), so phones notice.
 
-const VERSION = 'e6a1bbe07219';
-const CACHE = `cube-away-${VERSION}`;
+const VERSION = 'ef7d970f9955';
+const CACHE = `unstack-${VERSION}`;
 const ASSETS = [
   './',
   'index.html',

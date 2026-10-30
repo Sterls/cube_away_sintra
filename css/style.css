@@ -75,6 +75,10 @@ button { font: inherit; color: inherit; cursor: pointer; }
   text-align: center;
 }
 #home h1 { font-size: 46px; margin: 8px 0 0; letter-spacing: -0.5px; }
+.edition {
+  margin: -10px 0 4px; font-size: 15px; font-weight: 800; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--accent);
+}
 .tagline { font-size: 19px; color: var(--ink-soft); margin: 0 0 18px; line-height: 1.45; }
 
 .logo { position: relative; width: 150px; height: 120px; }

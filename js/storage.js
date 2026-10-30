@@ -1,6 +1,6 @@
 // Progress and settings, saved on the phone only.
 
-const KEY = 'cube-away-save-v1';
+const KEY = 'cube-away-save-v1'; // kept from the game's old name so progress carries over
 
 const defaults = () => ({
   unlocked: 1, stars: {}, trophies: {}, sound: true, vibrate: true, seenHelp: false,

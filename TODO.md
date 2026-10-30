@@ -9,10 +9,14 @@ Tick items off as they're done (`- [x]`).
 
 ## 1. Name and branding (do first)
 
-- [ ] Pick a new name. "Cube Away" belongs to an existing game.
+- [x] Pick a new name: **Unstack – Cube Edition**. "Cube Away" belongs to an existing game.
+- [ ] Check "Unstack" is safe to use: a browser game called "Unstack Cube 2026"
+      (KAHOXA Games, a 3D logic puzzle) already exists. If the searches below
+      show a conflict, pick another name before buying the web address.
 - [ ] Search the name on Google Play, the App Store and the
       [UK IPO trademark search](https://trademarks.ipo.gov.uk/ipo-tmtext) first.
-- [ ] Update the title, home screen, icon, manifest and store listing with the new name.
+- [x] Update the title, home screen and install name (manifest) with the new name.
+- [ ] Use the new name in the store listings.
 - [ ] Keep all art, sounds and levels original. Never copy from the other
       game or its store screenshots.
 

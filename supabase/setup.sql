@@ -1,4 +1,4 @@
--- Leaderboard for Cube Away.
+-- Leaderboard for Unstack – Cube Edition.
 -- Paste this whole file into Supabase: SQL Editor -> New query -> Run.
 --
 -- Each phone gets a random secret id. Scores can only be written through

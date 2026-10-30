@@ -1,4 +1,4 @@
-# Cube Away
+# Unstack – Cube Edition
 
 A calm 3D cube puzzle with **no ads, no tracking and no accounts**.
 
