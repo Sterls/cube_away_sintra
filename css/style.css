@@ -180,7 +180,8 @@ button { font: inherit; color: inherit; cursor: pointer; }
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
   padding: 14px 4px 0; font-size: 16px; color: var(--ink-soft);
 }
-.link-btn { border: 0; background: none; color: var(--accent); font-weight: 700; font-size: 16px; padding: 8px; }
+.link-btn { border: 0; background: none; color: var(--accent); font-weight: 700; font-size: 16px; padding: 8px; text-decoration: none; }
+.board-note { margin: -4px 0 0; font-size: 14px; color: var(--ink-soft); text-align: center; }
 
 /* ---------- in-game ---------- */
 

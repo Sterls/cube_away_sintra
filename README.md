@@ -33,7 +33,7 @@ in the way, it bumps and comes back. Clear every cube to finish the level.
 The game is plain static files with no build step. In the repository on GitHub, go to
 **Settings → Pages**, set **Source** to *Deploy from a branch*, choose the
 branch and the `/ (root)` folder, and save. After a minute it is live at
-`https://<owner>.github.io/cube_away_sintra/`.
+`https://sterls.github.io/whoosh_blocks/`.
 
 ## Setting up the leaderboard (optional, free)
 

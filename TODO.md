@@ -22,14 +22,15 @@ Tick items off as they're done (`- [x]`).
 
 ## 2. Privacy (UK GDPR, store rules)
 
-- [ ] Write a privacy policy and host it next to the game (`privacy.html`). It must say:
+- [x] Write a privacy policy and host it next to the game (`privacy.html`). It must say:
   - what's collected: leaderboard name, a random player ID, furthest level beaten
   - what the database and hosting providers see: IP addresses in their logs
   - who processes it (Supabase, the hosting provider) and where
   - how long it's kept
   - how to get it deleted
   - a contact email
-- [ ] Link the privacy policy from the Settings screen and from both store listings.
+- [x] Link the privacy policy from the Settings screen.
+- [ ] Link the privacy policy from both store listings (text ready in `store/PLAY_STORE.md`).
 - [ ] Add a "Remove me from the leaderboard" button that deletes the player's
       row (new `delete_score(secret)` database function).
 - [ ] Decide how long scores are kept, e.g. delete entries inactive for
@@ -53,7 +54,7 @@ Tick items off as they're done (`- [x]`).
       be played by under-18s? If yes, use high-privacy defaults, e.g. the
       leaderboard off until the player chooses to join (already the case),
       with no real names encouraged.
-- [ ] Add a line on the name screen: "Don't use your real name."
+- [x] Add a line on the name screen: "Don't use your real name."
 
 ## 4. Leaderboard safety (Online Safety Act, Apple guideline 1.2)
 
@@ -87,7 +88,7 @@ Typed-in names shown to other players make this a "user-to-user service".
 
 - [ ] Write short terms of use (`terms.html`): the game is provided "as is"
       with no guarantees, plus the leaderboard rules. Link from Settings and the stores.
-- [ ] Add an "About & licences" screen with the three.js MIT licence notice
+- [x] Add an "About & licences" screen with the three.js MIT licence notice
       (required by its licence) and a credit line.
 
 ## 7. Store submission

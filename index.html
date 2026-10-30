@@ -56,7 +56,8 @@
     </header>
     <form id="board-join" class="board-join hidden">
       <label for="name-input">Pick a name to join the leaderboard</label>
-      <input id="name-input" maxlength="20" autocomplete="nickname" placeholder="Your name" required>
+      <input id="name-input" maxlength="20" autocomplete="nickname" placeholder="A nickname" required>
+      <p class="board-note">Shown publicly. Please don't use your real name.</p>
       <button class="btn" type="submit">Join</button>
     </form>
     <p id="board-status" class="board-status"></p>
@@ -113,6 +114,7 @@
       <label class="toggle"><span>Vibration</span><input type="checkbox" id="vibrate-toggle"><i></i></label>
       <button id="reset-btn" class="btn ghost danger">Reset progress</button>
       <button id="settings-close" class="btn">Done</button>
+      <a class="link-btn" href="privacy.html">Privacy policy &amp; licences</a>
     </div>
   </div>
 
