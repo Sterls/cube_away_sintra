@@ -9,7 +9,7 @@ Tick items off as they're done (`- [x]`).
 
 ## 1. Name and branding (do first)
 
-- [x] Pick a new name: **Whoosh Blocks**. "Cube Away" belongs to an existing game.
+- [x] Pick a name: **Whoosh Blocks**.
 - [ ] Search "Whoosh Blocks" on Google Play, the App Store and the
       [UK IPO trademark search](https://trademarks.ipo.gov.uk/ipo-tmtext) first.
 - [x] Update the title, home screen and install name (manifest) with the new name.

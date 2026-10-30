@@ -392,7 +392,7 @@ function init() {
   });
   $('settings-close').addEventListener('click', () => { play('click'); history.back(); });
 
-  if (location.search.includes('debug')) window.cubeAway = { game, startLevel };
+  if (location.search.includes('debug')) window.whoosh = { game, startLevel };
 
   history.replaceState({ screen: 'home' }, '');
   show('home');

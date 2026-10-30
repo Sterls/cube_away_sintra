@@ -1,6 +1,8 @@
 // Progress and settings, saved on the phone only.
 
-const KEY = 'cube-away-save-v1'; // kept from the game's old name so progress carries over
+const KEY = 'whoosh-blocks-save-v1';
+// Early test versions saved under this key. Safe to delete once players have updated.
+const OLD_KEY = 'cube-away-save-v1';
 
 const defaults = () => ({
   unlocked: 1, stars: {}, trophies: {}, sound: true, vibrate: true, seenHelp: false,
@@ -19,6 +21,9 @@ function newId() {
 export function load() {
   let data;
   try {
+    const old = localStorage.getItem(OLD_KEY);
+    if (old && !localStorage.getItem(KEY)) localStorage.setItem(KEY, old);
+    if (old) localStorage.removeItem(OLD_KEY);
     const raw = localStorage.getItem(KEY);
     data = raw ? { ...defaults(), ...JSON.parse(raw) } : defaults();
   } catch {
