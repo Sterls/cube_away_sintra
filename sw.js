@@ -8,8 +8,8 @@
 // VERSION is a fingerprint of the files below. Run `npm run stamp` after
 // changing any of them (`npm test` fails if you forget), so phones notice.
 
-const VERSION = 'ef7d970f9955';
-const CACHE = `unstack-${VERSION}`;
+const VERSION = 'aaddd3704e0e';
+const CACHE = `whoosh-blocks-${VERSION}`;
 const ASSETS = [
   './',
   'index.html',

@@ -1,7 +1,7 @@
 {
-  "name": "Unstack – Cube Edition",
-  "short_name": "Unstack",
-  "description": "A calm 3D cube puzzle. No ads.",
+  "name": "Whoosh Blocks",
+  "short_name": "Whoosh",
+  "description": "A calm 3D cube puzzle. Tap each cube to send it flying.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

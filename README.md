@@ -1,4 +1,4 @@
-# Unstack – Cube Edition
+# Whoosh Blocks
 
 A calm 3D cube puzzle with **no ads, no tracking and no accounts**.
 
